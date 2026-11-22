@@ -15,18 +15,21 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _index = 0;
 
-  final _pages = const [
-    HomeScreen(),
-    OrdersScreen(),
-    ClientsScreen(),
-    InventoryScreen(),
-    TechniciansScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final pages = [
+      HomeScreen(
+        onGoToOrders: () => setState(() => _index = 1),
+        onGoToInventory: () => setState(() => _index = 3),
+      ),
+      const OrdersScreen(),
+      const ClientsScreen(),
+      const InventoryScreen(),
+      const TechniciansScreen(),
+    ];
+
     return Scaffold(
-      body: _pages[_index],
+      body: pages[_index],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: (i) => setState(() => _index = i),

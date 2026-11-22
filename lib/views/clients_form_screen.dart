@@ -38,11 +38,12 @@ class _ClientsFormScreenState extends ConsumerState<ClientsFormScreen> {
     setState(() => _saving = true);
     try {
       if (widget.clientId == null) {
-        await ref.read(clientesProvider.notifier).agregarCliente(nombre: _nombreCtrl.text.trim(), telefono: _telefonoCtrl.text.trim());
+        final id = await ref.read(clientesProvider.notifier).agregarCliente(nombre: _nombreCtrl.text.trim(), telefono: _telefonoCtrl.text.trim());
+        if (mounted) Navigator.pop(context, id);
       } else {
         await ref.read(clientesProvider.notifier).actualizarCliente(id: widget.clientId!, nombre: _nombreCtrl.text.trim(), telefono: _telefonoCtrl.text.trim());
+        if (mounted) Navigator.pop(context);
       }
-      if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {

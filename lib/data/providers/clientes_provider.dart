@@ -19,13 +19,13 @@ class ClientesViewModel extends AsyncNotifier<List<Cliente>> {
   }
 
   // INSERTAR
-  Future<void> agregarCliente({
+  Future<int> agregarCliente({
     required String nombre,
     required String telefono,
   }) async {
     final db = ref.read(databaseProvider);
 
-    await db.into(db.clientes).insert(
+    final id = await db.into(db.clientes).insert(
       ClientesCompanion.insert(
         nombre: nombre,
         telefono: telefono,
@@ -35,6 +35,8 @@ class ClientesViewModel extends AsyncNotifier<List<Cliente>> {
     state = await AsyncValue.guard(
           () => db.select(db.clientes).get(),
     );
+
+    return id;
   }
 
   // ACTUALIZAR

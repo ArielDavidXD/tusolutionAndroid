@@ -2437,6 +2437,222 @@ class OrdenRepuestosCompanion extends UpdateCompanion<OrdenRepuesto> {
   }
 }
 
+class $AjustesTable extends Ajustes with TableInfo<$AjustesTable, Ajuste> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AjustesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _claveMeta = const VerificationMeta('clave');
+  @override
+  late final GeneratedColumn<String> clave = GeneratedColumn<String>(
+    'clave',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valorMeta = const VerificationMeta('valor');
+  @override
+  late final GeneratedColumn<String> valor = GeneratedColumn<String>(
+    'valor',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [clave, valor];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'ajustes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Ajuste> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('clave')) {
+      context.handle(
+        _claveMeta,
+        clave.isAcceptableOrUnknown(data['clave']!, _claveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_claveMeta);
+    }
+    if (data.containsKey('valor')) {
+      context.handle(
+        _valorMeta,
+        valor.isAcceptableOrUnknown(data['valor']!, _valorMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {clave};
+  @override
+  Ajuste map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Ajuste(
+      clave: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}clave'],
+      )!,
+      valor: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}valor'],
+      ),
+    );
+  }
+
+  @override
+  $AjustesTable createAlias(String alias) {
+    return $AjustesTable(attachedDatabase, alias);
+  }
+}
+
+class Ajuste extends DataClass implements Insertable<Ajuste> {
+  final String clave;
+  final String? valor;
+  const Ajuste({required this.clave, this.valor});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['clave'] = Variable<String>(clave);
+    if (!nullToAbsent || valor != null) {
+      map['valor'] = Variable<String>(valor);
+    }
+    return map;
+  }
+
+  AjustesCompanion toCompanion(bool nullToAbsent) {
+    return AjustesCompanion(
+      clave: Value(clave),
+      valor: valor == null && nullToAbsent
+          ? const Value.absent()
+          : Value(valor),
+    );
+  }
+
+  factory Ajuste.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Ajuste(
+      clave: serializer.fromJson<String>(json['clave']),
+      valor: serializer.fromJson<String?>(json['valor']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'clave': serializer.toJson<String>(clave),
+      'valor': serializer.toJson<String?>(valor),
+    };
+  }
+
+  Ajuste copyWith({
+    String? clave,
+    Value<String?> valor = const Value.absent(),
+  }) => Ajuste(
+    clave: clave ?? this.clave,
+    valor: valor.present ? valor.value : this.valor,
+  );
+  Ajuste copyWithCompanion(AjustesCompanion data) {
+    return Ajuste(
+      clave: data.clave.present ? data.clave.value : this.clave,
+      valor: data.valor.present ? data.valor.value : this.valor,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Ajuste(')
+          ..write('clave: $clave, ')
+          ..write('valor: $valor')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(clave, valor);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Ajuste &&
+          other.clave == this.clave &&
+          other.valor == this.valor);
+}
+
+class AjustesCompanion extends UpdateCompanion<Ajuste> {
+  final Value<String> clave;
+  final Value<String?> valor;
+  final Value<int> rowid;
+  const AjustesCompanion({
+    this.clave = const Value.absent(),
+    this.valor = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AjustesCompanion.insert({
+    required String clave,
+    this.valor = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : clave = Value(clave);
+  static Insertable<Ajuste> custom({
+    Expression<String>? clave,
+    Expression<String>? valor,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (clave != null) 'clave': clave,
+      if (valor != null) 'valor': valor,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AjustesCompanion copyWith({
+    Value<String>? clave,
+    Value<String?>? valor,
+    Value<int>? rowid,
+  }) {
+    return AjustesCompanion(
+      clave: clave ?? this.clave,
+      valor: valor ?? this.valor,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (clave.present) {
+      map['clave'] = Variable<String>(clave.value);
+    }
+    if (valor.present) {
+      map['valor'] = Variable<String>(valor.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AjustesCompanion(')
+          ..write('clave: $clave, ')
+          ..write('valor: $valor, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2448,6 +2664,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TrabajosRealizadosTable trabajosRealizados =
       $TrabajosRealizadosTable(this);
   late final $OrdenRepuestosTable ordenRepuestos = $OrdenRepuestosTable(this);
+  late final $AjustesTable ajustes = $AjustesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2460,6 +2677,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     ordenes,
     trabajosRealizados,
     ordenRepuestos,
+    ajustes,
   ];
 }
 
@@ -3801,6 +4019,139 @@ typedef $$OrdenRepuestosTableProcessedTableManager =
       OrdenRepuesto,
       PrefetchHooks Function()
     >;
+typedef $$AjustesTableCreateCompanionBuilder =
+    AjustesCompanion Function({
+      required String clave,
+      Value<String?> valor,
+      Value<int> rowid,
+    });
+typedef $$AjustesTableUpdateCompanionBuilder =
+    AjustesCompanion Function({
+      Value<String> clave,
+      Value<String?> valor,
+      Value<int> rowid,
+    });
+
+class $$AjustesTableFilterComposer
+    extends Composer<_$AppDatabase, $AjustesTable> {
+  $$AjustesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get clave => $composableBuilder(
+    column: $table.clave,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valor => $composableBuilder(
+    column: $table.valor,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$AjustesTableOrderingComposer
+    extends Composer<_$AppDatabase, $AjustesTable> {
+  $$AjustesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get clave => $composableBuilder(
+    column: $table.clave,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valor => $composableBuilder(
+    column: $table.valor,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AjustesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AjustesTable> {
+  $$AjustesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get clave =>
+      $composableBuilder(column: $table.clave, builder: (column) => column);
+
+  GeneratedColumn<String> get valor =>
+      $composableBuilder(column: $table.valor, builder: (column) => column);
+}
+
+class $$AjustesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AjustesTable,
+          Ajuste,
+          $$AjustesTableFilterComposer,
+          $$AjustesTableOrderingComposer,
+          $$AjustesTableAnnotationComposer,
+          $$AjustesTableCreateCompanionBuilder,
+          $$AjustesTableUpdateCompanionBuilder,
+          (Ajuste, BaseReferences<_$AppDatabase, $AjustesTable, Ajuste>),
+          Ajuste,
+          PrefetchHooks Function()
+        > {
+  $$AjustesTableTableManager(_$AppDatabase db, $AjustesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AjustesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AjustesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AjustesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> clave = const Value.absent(),
+                Value<String?> valor = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AjustesCompanion(clave: clave, valor: valor, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String clave,
+                Value<String?> valor = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AjustesCompanion.insert(
+                clave: clave,
+                valor: valor,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AjustesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AjustesTable,
+      Ajuste,
+      $$AjustesTableFilterComposer,
+      $$AjustesTableOrderingComposer,
+      $$AjustesTableAnnotationComposer,
+      $$AjustesTableCreateCompanionBuilder,
+      $$AjustesTableUpdateCompanionBuilder,
+      (Ajuste, BaseReferences<_$AppDatabase, $AjustesTable, Ajuste>),
+      Ajuste,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3819,4 +4170,6 @@ class $AppDatabaseManager {
       $$TrabajosRealizadosTableTableManager(_db, _db.trabajosRealizados);
   $$OrdenRepuestosTableTableManager get ordenRepuestos =>
       $$OrdenRepuestosTableTableManager(_db, _db.ordenRepuestos);
+  $$AjustesTableTableManager get ajustes =>
+      $$AjustesTableTableManager(_db, _db.ajustes);
 }

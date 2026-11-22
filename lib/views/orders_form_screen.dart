@@ -6,6 +6,7 @@ import '../data/providers/equipos_provider.dart';
 import '../data/providers/tecnicos_provider.dart';
 import '../data/providers/ordenes_provider.dart';
 import '../data/database/app_database.dart';
+import 'clients_form_screen.dart';
 import 'equipos_form_screen.dart';
 
 class OrdersFormScreen extends ConsumerStatefulWidget {
@@ -80,6 +81,7 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                       child: ListView(
                         children: [
                           DropdownButtonFormField<int>(
+                            key: ValueKey('cliente_$_selectedClienteId'),
                             initialValue: _selectedClienteId,
                             decoration: const InputDecoration(labelText: 'Cliente'),
                             items: clientes.map((c) => DropdownMenuItem(value: c.id, child: Text(c.nombre))).toList(),
@@ -89,9 +91,27 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                             }),
                             validator: (v) => v == null ? 'Seleccione un cliente' : null,
                           ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed: () async {
+                                final nuevoId = await Navigator.of(context).push<int>(
+                                  MaterialPageRoute(builder: (_) => const ClientsFormScreen()),
+                                );
+                                if (nuevoId != null && mounted) {
+                                  setState(() {
+                                    _selectedClienteId = nuevoId;
+                                    _selectedEquipoId = null;
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.person_add_alt),
+                              label: const Text('Registrar nuevo cliente'),
+                            ),
+                          ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<int>(
-                            key: ValueKey('equipo_$_selectedClienteId'),
+                            key: ValueKey('equipo_${_selectedClienteId}_$_selectedEquipoId'),
                             initialValue: _selectedEquipoId,
                             decoration: const InputDecoration(labelText: 'Equipo'),
                             items: equiposDelCliente.map((e) => DropdownMenuItem(value: e.id, child: Text('${e.tipoEquipo} ${e.marca} ${e.modelo}'))).toList(),

@@ -5,6 +5,7 @@ class SummaryCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color? color;
+  final VoidCallback? onTap;
 
   const SummaryCard({
     super.key,
@@ -12,13 +13,17 @@ class SummaryCard extends StatelessWidget {
     required this.value,
     required this.icon,
     this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final c = color ?? Theme.of(context).colorScheme.primary;
     return Card(
-      child: Padding(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
@@ -38,6 +43,7 @@ class SummaryCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

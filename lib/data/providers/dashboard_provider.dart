@@ -1,8 +1,8 @@
-import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/app_database.dart';
-import 'database_provider.dart';
+import 'ordenes_provider.dart';
+import 'repuestos_provider.dart';
 
 class DashboardData {
   final int totalOrdenes;
@@ -10,6 +10,7 @@ class DashboardData {
   final int listas;
   final int entregadas;
   final int recibidas;
+  final int canceladas;
   final List<Ordene> recientes;
   final List<Repuesto> bajoStock;
 
@@ -19,30 +20,27 @@ class DashboardData {
     required this.listas,
     required this.entregadas,
     required this.recibidas,
+    required this.canceladas,
     required this.recientes,
     required this.bajoStock,
   });
 }
 
 final dashboardProvider = FutureProvider<DashboardData>((ref) async {
-  final db = ref.watch(databaseProvider);
+  final ordenes = await ref.watch(ordenesProvider.future);
+  final repuestos = await ref.watch(repuestosProvider.future);
 
-  final ordenes = await db.select(db.ordenes).get();
   final totalOrdenes = ordenes.length;
   final recibidas = ordenes.where((o) => o.estado == 'recibida').length;
   final enReparacion = ordenes.where((o) => o.estado == 'en reparación').length;
   final listas = ordenes.where((o) => o.estado == 'lista').length;
   final entregadas = ordenes.where((o) => o.estado == 'entregada').length;
+  final canceladas = ordenes.where((o) => o.estado == 'cancelada').length;
 
-  final recientes = (await (db.select(db.ordenes)
-        ..orderBy([(t) => OrderingTerm.desc(t.fechaRecepcion)])
-        ..limit(5))
-      .get());
+  final recientes = ordenes.take(5).toList();
 
-  final bajoStock = (await (db.select(db.repuestos)
-        ..where((r) => r.existencias.isSmallerOrEqualValue(5))
-        ..orderBy([(t) => OrderingTerm.asc(t.existencias)]))
-      .get());
+  final bajoStock = repuestos.where((r) => r.existencias <= 5).toList()
+    ..sort((a, b) => a.existencias.compareTo(b.existencias));
 
   return DashboardData(
     totalOrdenes: totalOrdenes,
@@ -50,6 +48,7 @@ final dashboardProvider = FutureProvider<DashboardData>((ref) async {
     listas: listas,
     entregadas: entregadas,
     recibidas: recibidas,
+    canceladas: canceladas,
     recientes: recientes,
     bajoStock: bajoStock,
   );

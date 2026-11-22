@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:tusolution/data/database/tables/ajustes.dart';
 import 'package:tusolution/data/database/tables/clientes.dart';
 import 'package:tusolution/data/database/tables/equipos.dart';
 import 'package:tusolution/data/database/tables/orden_repuestos.dart';
@@ -11,13 +12,13 @@ import 'tables/tecnicos.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Tecnicos, Clientes, Repuestos, Equipos, Ordenes, TrabajosRealizados, OrdenRepuestos])
+@DriftDatabase(tables: [Tecnicos, Clientes, Repuestos, Equipos, Ordenes, TrabajosRealizados, OrdenRepuestos, Ajustes])
 class AppDatabase extends _$AppDatabase {
 
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -25,7 +26,9 @@ class AppDatabase extends _$AppDatabase {
       await m.createAll();
     },
     onUpgrade: (m, from, to) async {
-      // v1->v2: allow existencias >= 0 (constraint change handled by recreate in dev if needed)
+      if (from < 3) {
+        await m.createTable(ajustes);
+      }
     },
   );
 

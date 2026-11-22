@@ -23,6 +23,8 @@ Proyecto desarrollado para la asignatura **Programación para Dispositivos Móvi
 - **Trabajos realizados**: registro de trabajos con su costo de mano de obra.
 - **Repuestos**: inventario con código único, precio y existencias. Al usar un repuesto en una orden, el stock se descuenta automáticamente dentro de una **transacción** (si no hay existencias suficientes, la operación se rechaza). Al eliminar el repuesto de la orden, el stock se devuelve.
 - **Costo total** de cada orden: mano de obra + repuestos.
+- **Tema de la aplicación**: claro, oscuro o según el sistema, con la preferencia guardada en la base de datos local.
+- **Accesos rápidos desde el inicio**: tocar una orden reciente abre su detalle; tocar una alerta de stock lleva al inventario.
 
 ## Estructura del proyecto
 
@@ -91,9 +93,7 @@ lib/
 
 ## Base de datos
 
-La base de datos SQLite se crea automáticamente la primera vez que se abre la app (archivo local `tu_solution.sqlite`). El esquema consta de 7 tablas:
-
-`tecnicos`, `clientes`, `repuestos`, `equipos`, `ordenes`, `trabajos_realizados` y `orden_repuestos`, con sus claves foráneas (equipo → cliente, orden → equipo/técnico, etc.).
+La base de datos SQLite se crea automáticamente la primera vez que se abre la app (archivo local `tu_solution.sqlite`). El esquema consta de 8 tablas: `tecnicos`, `clientes`, `repuestos`, `equipos`, `ordenes`, `trabajos_realizados`, `orden_repuestos` y `ajustes` (preferencias), con sus claves foráneas (equipo → cliente, orden → equipo/técnico, etc.).
 
 ## Capturas de pantalla
 
