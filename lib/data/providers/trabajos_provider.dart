@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/app_database.dart';
 import 'database_provider.dart';
+import 'historial_providers.dart';
 
 final trabajosPorOrdenProvider = FutureProvider.family<List<TrabajosRealizado>, int>((ref, idOrden) async {
   final db = ref.watch(databaseProvider);
@@ -27,12 +28,14 @@ class TrabajosViewModel {
       ),
     );
     ref.invalidate(trabajosPorOrdenProvider(idOrden));
+    ref.invalidate(totalOrdenProvider(idOrden));
   }
 
   Future<void> eliminarTrabajo({required int id, required int idOrden}) async {
     final db = ref.read(databaseProvider);
     await (db.delete(db.trabajosRealizados)..where((t) => t.id.equals(id))).go();
     ref.invalidate(trabajosPorOrdenProvider(idOrden));
+    ref.invalidate(totalOrdenProvider(idOrden));
   }
 }
 

@@ -9,6 +9,7 @@ import '../data/providers/trabajos_provider.dart';
 import '../data/providers/orden_repuestos_provider.dart';
 import '../data/providers/repuestos_provider.dart';
 import '../data/widgets/status_badge.dart';
+import 'orders_form_screen.dart';
 
 class OrdersDetailsScreen extends ConsumerWidget {
   final int orderId;
@@ -24,13 +25,37 @@ class OrdersDetailsScreen extends ConsumerWidget {
     final ordenRepuestosAsync = ref.watch(ordenRepuestosPorOrdenProvider(orderId));
     final repuestosAsync = ref.watch(repuestosProvider);
 
+    final orden = ordenesAsync.value?.where((o) => o.id == orderId).firstOrNull;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Orden #$orderId')),
+      appBar: AppBar(
+        title: Text('Orden #$orderId'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Editar orden',
+            onPressed: orden == null
+                ? null
+                : () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => OrdersFormScreen(
+                          orderId: orden.id,
+                          initialIdEquipo: orden.idEquipo,
+                          initialIdTecnico: orden.idTecnico,
+                          initialFalla: orden.fallaReportada,
+                          initialEstado: orden.estado,
+                        ),
+                      ),
+                    );
+                  },
+          ),
+        ],
+      ),
       body: ordenesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (ordenes) {
-          final orden = ordenes.where((o) => o.id == orderId).firstOrNull;
           if (orden == null) return const Center(child: Text('Orden no encontrada'));
           final equipo = equiposAsync.value?.where((e) => e.id == orden.idEquipo).firstOrNull;
           final cliente = (equipo != null) ? clientesAsync.value?.where((c) => c.id == equipo.idCliente).firstOrNull : null;

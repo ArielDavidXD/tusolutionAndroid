@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers/ordenes_provider.dart';
+import '../data/providers/tecnicos_provider.dart';
 import '../data/widgets/order_card.dart';
 import 'orders_form_screen.dart';
 import 'orders_details_screen.dart';
@@ -19,6 +20,7 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     final ordenesAsync = ref.watch(ordenesProvider);
+    final tecnicosAsync = ref.watch(tecnicosProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Órdenes')),
@@ -55,12 +57,15 @@ class _OrdersScreenState extends ConsumerState<OrdersScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.all(12),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, i) {
                     final o = filtered[i];
+                    final tecnico = o.idTecnico != null
+                        ? tecnicosAsync.value?.where((t) => t.id == o.idTecnico).firstOrNull
+                        : null;
                     return OrderCard(
                       title: 'Orden #${o.id}',
-                      subtitle: 'Falla: ${o.fallaReportada}',
+                      subtitle: '${o.fallaReportada}\nTécnico: ${tecnico?.nombre ?? 'Sin asignar'}',
                       status: o.estado,
                       onTap: () {
                         Navigator.of(context).push(MaterialPageRoute(builder: (_) => OrdersDetailsScreen(orderId: o.id)));

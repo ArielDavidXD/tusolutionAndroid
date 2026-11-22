@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/providers/carga_tecnico_provider.dart';
 import '../data/providers/tecnicos_provider.dart';
+import 'technician_detail_screen.dart';
 import 'technicias_form_screen.dart';
 
 class TechniciansScreen extends ConsumerWidget {
@@ -10,6 +12,7 @@ class TechniciansScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tecnicosAsync = ref.watch(tecnicosProvider);
+    final cargaAsync = ref.watch(cargaTecnicosProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Técnicos')),
@@ -29,13 +32,22 @@ class TechniciansScreen extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: tecnicos.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final t = tecnicos[i];
+              final carga = cargaAsync.value?.where((c) => c.tecnico.id == t.id).firstOrNull;
               return Card(
                 child: ListTile(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => TechnicianDetailScreen(tecnicoId: t.id)),
+                    );
+                  },
                   title: Text(t.nombre),
-                  subtitle: Text(t.telefono),
+                  subtitle: Text(
+                    '${t.telefono}'
+                    '${carga != null ? ' • ${carga.abiertas} abiertas • ${carga.listas} listas • ${carga.entregadas} entregadas' : ''}',
+                  ),
                   trailing: PopupMenuButton<String>(
                     onSelected: (v) async {
                       if (v == 'edit') {

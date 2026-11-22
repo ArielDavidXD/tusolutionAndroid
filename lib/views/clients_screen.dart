@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/providers/clientes_provider.dart';
+import 'client_detail_screen.dart';
 import 'clients_form_screen.dart';
 
 class ClientsScreen extends ConsumerWidget {
@@ -27,11 +28,16 @@ class ClientsScreen extends ConsumerWidget {
           return ListView.separated(
             padding: const EdgeInsets.all(12),
             itemCount: clientes.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, i) {
               final c = clientes[i];
               return Card(
                 child: ListTile(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => ClientDetailScreen(clientId: c.id)),
+                    );
+                  },
                   title: Text(c.nombre),
                   subtitle: Text(c.telefono),
                   trailing: PopupMenuButton<String>(

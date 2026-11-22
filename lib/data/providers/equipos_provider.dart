@@ -15,7 +15,7 @@ class EquiposViewModel extends AsyncNotifier<List<Equipo>> {
     return (db.select(db.equipos)..orderBy([(t) => OrderingTerm.desc(t.id)])).get();
   }
 
-  Future<void> agregarEquipo({
+  Future<int> agregarEquipo({
     required int idCliente,
     required String tipoEquipo,
     required String marca,
@@ -23,7 +23,7 @@ class EquiposViewModel extends AsyncNotifier<List<Equipo>> {
     String? numeroSerie,
   }) async {
     final db = ref.read(databaseProvider);
-    await db.into(db.equipos).insert(
+    final id = await db.into(db.equipos).insert(
       EquiposCompanion.insert(
         idCliente: idCliente,
         tipoEquipo: tipoEquipo,
@@ -33,6 +33,7 @@ class EquiposViewModel extends AsyncNotifier<List<Equipo>> {
       ),
     );
     await _refresh(db);
+    return id;
   }
 
   Future<void> actualizarEquipo({

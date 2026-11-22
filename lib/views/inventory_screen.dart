@@ -46,12 +46,12 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.all(12),
                   itemCount: filtered.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
                   itemBuilder: (context, i) {
                     final r = filtered[i];
                     final low = r.existencias <= 5;
                     return Card(
-                      color: low ? Colors.red.withOpacity(0.06) : null,
+                      color: low ? Colors.red.withValues(alpha: 0.06) : null,
                       child: ListTile(
                         title: Text(r.nombre),
                         subtitle: Text('Código: ${r.codigo} • Stock: ${r.existencias} • \$${r.precio.toStringAsFixed(2)}'),

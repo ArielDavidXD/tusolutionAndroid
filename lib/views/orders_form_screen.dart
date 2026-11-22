@@ -6,6 +6,7 @@ import '../data/providers/equipos_provider.dart';
 import '../data/providers/tecnicos_provider.dart';
 import '../data/providers/ordenes_provider.dart';
 import '../data/database/app_database.dart';
+import 'equipos_form_screen.dart';
 
 class OrdersFormScreen extends ConsumerStatefulWidget {
   final int? orderId;
@@ -79,7 +80,7 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                       child: ListView(
                         children: [
                           DropdownButtonFormField<int>(
-                            value: _selectedClienteId,
+                            initialValue: _selectedClienteId,
                             decoration: const InputDecoration(labelText: 'Cliente'),
                             items: clientes.map((c) => DropdownMenuItem(value: c.id, child: Text(c.nombre))).toList(),
                             onChanged: (v) => setState(() {
@@ -90,11 +91,29 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<int>(
-                            value: _selectedEquipoId,
+                            key: ValueKey('equipo_$_selectedClienteId'),
+                            initialValue: _selectedEquipoId,
                             decoration: const InputDecoration(labelText: 'Equipo'),
                             items: equiposDelCliente.map((e) => DropdownMenuItem(value: e.id, child: Text('${e.tipoEquipo} ${e.marca} ${e.modelo}'))).toList(),
                             onChanged: (v) => setState(() => _selectedEquipoId = v),
                             validator: (v) => v == null ? 'Seleccione un equipo' : null,
+                          ),
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed: _selectedClienteId == null
+                                  ? null
+                                  : () async {
+                                      final nuevoId = await Navigator.of(context).push<int>(
+                                        MaterialPageRoute(builder: (_) => EquiposFormScreen(initialIdCliente: _selectedClienteId)),
+                                      );
+                                      if (nuevoId != null && mounted) {
+                                        setState(() => _selectedEquipoId = nuevoId);
+                                      }
+                                    },
+                              icon: const Icon(Icons.add),
+                              label: const Text('Registrar nuevo equipo'),
+                            ),
                           ),
                           const SizedBox(height: 12),
                           TextFormField(
@@ -105,7 +124,7 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                           ),
                           const SizedBox(height: 12),
                           DropdownButtonFormField<int?>(
-                            value: _selectedTecnicoId,
+                            initialValue: _selectedTecnicoId,
                             decoration: const InputDecoration(labelText: 'Técnico (opcional)'),
                             items: [
                               const DropdownMenuItem<int?>(value: null, child: Text('Sin asignar')),
@@ -116,7 +135,7 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                           if (widget.orderId != null) ...[
                             const SizedBox(height: 12),
                             DropdownButtonFormField<String>(
-                              value: _estado,
+                              initialValue: _estado,
                               decoration: const InputDecoration(labelText: 'Estado'),
                               items: const [
                                 DropdownMenuItem(value: 'recibida', child: Text('recibida')),
@@ -152,9 +171,9 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                                     fechaEntrega: fechaEntrega,
                                   );
                                 }
-                                if (mounted) Navigator.pop(context);
+                                if (context.mounted) Navigator.pop(context);
                               } catch (e) {
-                                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
                               } finally {
                                 if (mounted) setState(() => _saving = false);
                               }

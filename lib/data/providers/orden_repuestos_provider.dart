@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../database/app_database.dart';
 import 'database_provider.dart';
+import 'historial_providers.dart';
 import 'repuestos_provider.dart';
 
 final ordenRepuestosPorOrdenProvider = FutureProvider.family<List<OrdenRepuesto>, int>((ref, idOrden) async {
@@ -44,6 +45,7 @@ class OrdenRepuestosViewModel {
         );
       });
       ref.invalidate(ordenRepuestosPorOrdenProvider(idOrden));
+      ref.invalidate(totalOrdenProvider(idOrden));
       ref.invalidate(repuestosProvider);
       return null; // ok
     } catch (e) {
@@ -70,6 +72,7 @@ class OrdenRepuestosViewModel {
         }
       });
       ref.invalidate(ordenRepuestosPorOrdenProvider(idOrden));
+      ref.invalidate(totalOrdenProvider(idOrden));
       ref.invalidate(repuestosProvider);
       return null;
     } catch (e) {
