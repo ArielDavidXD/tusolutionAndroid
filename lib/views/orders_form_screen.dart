@@ -6,6 +6,7 @@ import '../data/providers/equipos_provider.dart';
 import '../data/providers/tecnicos_provider.dart';
 import '../data/providers/ordenes_provider.dart';
 import '../data/database/app_database.dart';
+import '../data/estados_orden.dart';
 import 'clients_form_screen.dart';
 import 'equipos_form_screen.dart';
 
@@ -154,18 +155,18 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                           ),
                           if (widget.orderId != null) ...[
                             const SizedBox(height: 12),
-                            DropdownButtonFormField<String>(
-                              initialValue: _estado,
-                              decoration: const InputDecoration(labelText: 'Estado'),
-                              items: const [
-                                DropdownMenuItem(value: 'recibida', child: Text('recibida')),
-                                DropdownMenuItem(value: 'en reparación', child: Text('en reparación')),
-                                DropdownMenuItem(value: 'lista', child: Text('lista')),
-                                DropdownMenuItem(value: 'entregada', child: Text('entregada')),
-                                DropdownMenuItem(value: 'cancelada', child: Text('cancelada')),
-                              ],
-                              onChanged: (v) => setState(() => _estado = v ?? 'recibida'),
-                            ),
+                            Text('Estado actual: $_estado'),
+                            if (estadosSiguientes(_estado).isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              DropdownButtonFormField<String?>(
+                                initialValue: null,
+                                decoration: const InputDecoration(labelText: 'Mover a (opcional)'),
+                                items: estadosSiguientes(_estado)
+                                    .map((s) => DropdownMenuItem<String?>(value: s, child: Text(s)))
+                                    .toList(),
+                                onChanged: (v) => setState(() => _estado = v ?? _estado),
+                              ),
+                            ],
                           ],
                           const SizedBox(height: 20),
                           FilledButton(
@@ -180,8 +181,27 @@ class _OrdersFormScreenState extends ConsumerState<OrdersFormScreen> {
                                     fallaReportada: _fallaCtrl.text.trim(),
                                   );
                                 } else {
+                                  if (_estado == 'cancelada' && widget.initialEstado != 'cancelada') {
+                                    final ok = await showDialog<bool>(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        title: const Text('Cancelar orden'),
+                                        content: const Text('¿Seguro que deseas cancelar esta orden?'),
+                                        actions: [
+                                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('No')),
+                                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sí, cancelar')),
+                                        ],
+                                      ),
+                                    );
+                                    if (ok != true) {
+                                      setState(() => _saving = false);
+                                      return;
+                                    }
+                                  }
                                   DateTime? fechaEntrega;
-                                  if (_estado == 'entregada') fechaEntrega = DateTime.now();
+                                  if (_estado == 'entregada' && widget.initialEstado != 'entregada') {
+                                    fechaEntrega = DateTime.now();
+                                  }
                                   await ref.read(ordenesProvider.notifier).actualizarOrden(
                                     id: widget.orderId!,
                                     idEquipo: _selectedEquipoId!,

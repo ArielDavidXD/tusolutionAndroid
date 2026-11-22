@@ -8,6 +8,7 @@ import '../data/providers/tecnicos_provider.dart';
 import '../data/providers/trabajos_provider.dart';
 import '../data/providers/orden_repuestos_provider.dart';
 import '../data/providers/repuestos_provider.dart';
+import '../data/estados_orden.dart';
 import '../data/widgets/status_badge.dart';
 import 'orders_form_screen.dart';
 
@@ -149,15 +150,36 @@ class OrdersDetailsScreen extends ConsumerWidget {
   }
 
   void _cambiarEstado(BuildContext context, WidgetRef ref, String current) {
+    final opciones = estadosSiguientes(current);
+    if (opciones.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Esta orden ya está finalizada y no puede cambiar de estado.')),
+      );
+      return;
+    }
     showModalBottomSheet(
       context: context,
       builder: (_) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: ['recibida', 'en reparación', 'lista', 'entregada', 'cancelada'].map((s) => ListTile(
+          children: opciones.map((s) => ListTile(
             title: Text(s),
             onTap: () async {
               Navigator.pop(context);
+              if (s == 'cancelada') {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: const Text('Cancelar orden'),
+                    content: const Text('¿Seguro que deseas cancelar esta orden?'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('No')),
+                      TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sí, cancelar')),
+                    ],
+                  ),
+                );
+                if (ok != true) return;
+              }
               DateTime? fechaEntrega;
               if (s == 'entregada') fechaEntrega = DateTime.now();
               await ref.read(ordenesProvider.notifier).cambiarEstado(id: orderId, estado: s, fechaEntrega: fechaEntrega);
